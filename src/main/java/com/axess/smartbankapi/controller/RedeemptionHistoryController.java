@@ -1,5 +1,7 @@
 package com.axess.smartbankapi.controller;
 
+import com.axess.smartbankapi.sqs.SQSService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,15 +21,22 @@ import com.axess.smartbankapi.service.RedeemptionHistoryService;
 @RestController
 @CrossOrigin
 @RequestMapping("/history")
+@Slf4j
 public class RedeemptionHistoryController {
 
 	
 	@Autowired
 	private RedeemptionHistoryService historyService;
+
+	@Autowired
+	SQSService sqsService;
 	
 	
 	@PostMapping("/")
 	public ResponseEntity<?> saveHistory(@RequestBody UserRedeemptionHistoryDto historyDto) throws RecordNotFoundException, RecordExistException, RecordNotCreatedException {
+		sqsService.sendMessage("kevin has placed the order");
+		sqsService.sendUserAccessLog("/history");
+		log.info("Message is send to SQS");
 		
 		ApiSuccessResponse response = new ApiSuccessResponse();
 
